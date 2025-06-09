@@ -26,5 +26,11 @@ priority=9999
 You can use `emerge` to install packages contained in the repository!
 
 ```
-sudo emerge -av hfst apertium vislcg3
+sudo emerge -av sys-cluster/modules
 ```
+
+or you can update all yours repos:
+```
+eix-sync
+```
+(but first install eix package by doing `emerge -av app-portage/eix`)
