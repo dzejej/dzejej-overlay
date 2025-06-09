@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE repositories SYSTEM "/dtd/repositories.dtd">
+<repositories xmlns="" version="1.0">
+  <repo quality="experimental" status="unofficial">
+    <name>flammie-overlay</name>
+    <description lang="en">dzejej's overlay</description>
+    <homepage>https://gitlab.com/dzejej/dzejej-overlay</homepage>
+    <owner type="person">
+      <email>Janusz.Andrzejewski@pwr.edu.pl</email>
+      <name>dzejej</name>
+    </owner>
+    <source type="git">git://gitlab.com/dzejej/dzejej-overlay.git </source>
+    <feed>https://gitlab.com/dzejej/dzejej-overlay/commits/master.atom</feed>
+  </repo>
+</repositories>
+
