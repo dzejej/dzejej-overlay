@@ -1,0 +1,150 @@
+--- a/pyproject.toml	2024-04-11 15:12:34.000000000 +0200
++++ b/pyproject.toml	2025-03-06 13:33:46.000000000 +0100
+@@ -1,19 +1,21 @@
+ [build-system]
+-requires = ["scikit-build-core", "numpy"]
++# Numpy build and runtime dependencies are linked to ABI compatibility
++# A new wheel rebuild is needed when changing these
++requires = ["scikit-build-core>=0.11", "numpy~=2.0"]
+ build-backend = "scikit_build_core.build"
+ 
+ [project]
+ name = "spglib"
+-requires-python = ">=3.8"
++requires-python = ">=3.9"
+ description = "This is the spglib module."
+-license = { text = "BSD-3-Clause" }
+-license-files = { paths = ["COPYING"] }
++license = "BSD-3-Clause"
++license-files = ["COPYING"]
+ readme = "python/README.rst"
+ dynamic = ["version"]
+ dependencies = [
+-    "numpy>=1.20",
+-    "typing-extensions; python_version<'3.9'",
++    "numpy>=1.20,<3",
+     "importlib-resources; python_version<'3.10'",
++    "typing-extensions>=4.9.0; python_version<'3.13'",
+ ]
+ authors = [
+     {name="Atsushi Togo", email="atz.togo@gmail.com"},
+@@ -30,15 +32,14 @@
+     "Operating System :: Unix",
+     "Operating System :: MacOS",
+     "Operating System :: Microsoft :: Windows",
+-    "License :: OSI Approved :: BSD License",
+     "Programming Language :: C",
+     "Programming Language :: Python :: 3",
+     "Programming Language :: Python :: 3 :: Only",
+-    "Programming Language :: Python :: 3.8",
+     "Programming Language :: Python :: 3.9",
+     "Programming Language :: Python :: 3.10",
+     "Programming Language :: Python :: 3.11",
+     "Programming Language :: Python :: 3.12",
++    "Programming Language :: Python :: 3.13",
+     "Development Status :: 5 - Production/Stable",
+ ]
+ 
+@@ -57,9 +58,10 @@
+     "Sphinx >= 7.0",
+     "sphinxcontrib-bibtex >= 2.5",
+     "sphinx-book-theme",
+-    "sphinx-autodoc2",
++    "sphinx-autodoc-typehints",
+     "myst-parser >= 2.0",
+     "linkify-it-py",
++    "sphinx-tippy",
+ ]
+ test-cov = [
+     "spglib[test]",
+@@ -82,7 +84,8 @@
+ ]
+ 
+ [tool.scikit-build]
+-wheel.packages = ["python/spglib"]
++cmake.source-dir = "python"
++wheel.install-dir = "spglib"
+ metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+ sdist.include = ["python/spglib/_version.py"]
+ 
+@@ -91,6 +94,11 @@
+ SPGLIB_WITH_TESTS = "OFF"
+ SPGLIB_USE_OMP = "OFF"
+ 
++[[tool.scikit-build.overrides]]
++if.env.CIBUILDWHEEL = true
++# Make sure cibuildwheel builds with a bundled spglib
++cmake.define.CMAKE_DISABLE_FIND_PACKAGE_Spglib = "ON"
++
+ [tool.setuptools_scm]
+ write_to = "python/spglib/_version.py"
+ 
+@@ -100,18 +108,8 @@
+ test-extras = "test"
+ test-command = "pytest {package}/test/functional/python"
+ 
+-[tool.cibuildwheel.linux]
+-# TODO: auditwheel fails if LD_LIBRARY_PATH is not set correctly. Not sure about apprropriate value to set to
+-#repair-wheel-command = "LD_LIBRARY_PATH=. auditwheel repair --lib-sdir . -w {dest_dir} {wheel}"
+-repair-wheel-command = ""
+-
+-[tool.cibuildwheel.macos]
+-# TODO: similar to above
+-#repair-wheel-command = "DYLD_LIBRARY_PATH=. delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+-repair-wheel-command = ""
+-
+ [tool.pytest.ini_options]
+-addopts = "-m 'not benchmark'"
++addopts = "-Werror -m 'not benchmark'"
+ testpaths = ["test/functional/python"]
+ markers = [
+     # Define benchmark marker to avoid warnings of marker not defined
+@@ -126,6 +124,11 @@
+ 
+ [tool.ruff]
+ line-length = 88
++exclude = [
++    "database/*"
++]
++
++[tool.ruff.lint]
+ extend-select = [
+     "F",           # pyflakes
+     # "W",           # pycodestyle-warnings
+@@ -180,7 +183,7 @@
+     "D101",
+     "D102",
+     "D103",
+-    "D203",  # Confilct with D211
++    "D203",  # Conflict with D211
+     "D205",
+     "D213",  # Conflict with D212
+ ]
+@@ -194,14 +197,22 @@
+ python_version = "3.12"
+ warn_unused_configs = true
+ show_error_codes = true
+-# TODO: Enable strict mode once we clean up type annotations
+-# strict = true
+ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+ no_strict_optional = true
++# TODO: Cannot handle examples and tests strictly yet
++strict = false
++# For tests, we don't need type-annotation on test fixtures
++# Haven't seen `mypy.overrides` used with `files` instead of `modules`,
++# so adding these options globally
++disallow_untyped_defs = false
++disallow_incomplete_defs = false
++
++[[tool.mypy.overrides]]
++# For the main library we want to be as strict as possible
++module = ["spglib.*"]
++disallow_untyped_defs = true
++disallow_incomplete_defs = true
+ 
+ [tool.codespell]
+ ignore-words = "docs/codespell.txt"
+ skip = "docs/references.bib"
+-
+-[tool.check-wheel-contents]
+-ignore = "W002"
