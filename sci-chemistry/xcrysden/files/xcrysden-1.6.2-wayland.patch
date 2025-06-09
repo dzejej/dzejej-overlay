@@ -1,0 +1,13 @@
+# https://unix.stackexchange.com/questions/702305/running-xcrysden-in-wayland
+
+--- a/Tcl/custom-definitions	2019-10-28 14:49:40.000000000 +0100
++++ b/Tcl/custom-definitions	2024-10-09 12:36:14.659173307 +0200
+@@ -18,7 +18,7 @@
+ # $XCRYSDEN_TOPDIR/Tcl/toglOpt.tcl
+ # ------------------------------------------------------------------------
+ 
+-#set toglOpt(accum)  false 
++set toglOpt(accum)  false 
+ #set toglOpt(stereo) none
+ 
+ 
