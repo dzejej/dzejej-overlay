@@ -1,7 +1,6 @@
 # Dzejej Overlay
 
-An overlay for gentoo for things dzejej's sometimes use.
-
+An gentoo overlay for things I sometimes use
 
 ## Install by hand (portage)
 
@@ -23,7 +22,7 @@ priority=9999
 
 ## Installing packages
 
-You can use `emerge` to install packages contained in the repository!
+You can use __emerge__ to install packages contained in the repository!
 
 ```
 sudo emerge -av sys-cluster/modules
